@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SysDash Ultra - Monitor 3 Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-ink">
+  <!-- 앰비언트 백그라운드 오로라 모션 -->
+  <div class="ambient-glow-layer">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <!-- 상단 커스텀 윈도우 바 & 컨트롤 -->
+  <header class="app-window-bar">
+    <div class="drag-handle">
+      <div class="app-brand">
+        <span class="brand-badge">ULTRA</span>
+        <span class="app-title-text">SysDash</span>
+      </div>
+      <div class="edition-switcher no-drag">
+        <button class="edition-btn active" id="btnInk">Ink Edition</button>
+        <button class="edition-btn" id="btnSnow">Snow Edition</button>
+      </div>
+      <div class="monitor-badge no-drag" id="monitorBadge" title="모니터 3 전용 와이드 뷰">
+        <span class="badge-dot"></span>
+        <span id="monitorBadgeText">DISPLAY 3 (2048×1152)</span>
+      </div>
+    </div>
+
+    <!-- 중앙 실시간 시계 & 시스템 상태 요약 -->
+    <div class="header-center-info">
+      <div class="system-time-group">
+        <span class="time-large" id="clockTime">--:--:-- --</span>
+        <span class="date-medium" id="clockDate">--/--/----</span>
+      </div>
+      <div class="system-status-pill">
+        <span class="status-pulse-dot"></span>
+        <span class="status-host" id="deviceName">DESKTOP-PC</span>
+        <span class="status-sep">|</span>
+        <span class="online-indicator" id="deviceStatus">Online</span>
+      </div>
+    </div>
+
+    <!-- 우측 윈도우 및 모니터 제어 버튼 -->
+    <div class="window-actions no-drag">
+      <div class="display-selector-wrap">
+        <button class="action-btn display-btn" id="displaySelectBtn" title="모니터 전환">🖥️ 모니터</button>
+        <div class="display-dropdown" id="displayDropdown"></div>
+      </div>
+      <button class="action-btn fullscreen-btn" id="fullscreenBtn" title="전체화면 토글">⛶</button>
+      <button class="action-btn pin-btn" id="pinBtn" title="항상 위에 고정">📌</button>
+      <button class="action-btn min-btn" id="minBtn" title="최소화">−</button>
+      <button class="action-btn max-btn" id="maxBtn" title="최대화">▢</button>
+      <button class="action-btn close-btn" id="closeBtn" title="닫기">×</button>
+    </div>
+  </header>
+
+  <!-- 메인 와이드 대시보드 그리드 (3열 컬럼) -->
+  <main class="dashboard-body wide-grid">
+
+    <!-- ==============================================
+         COLUMN 1: CPU & MEMORY
+         ============================================== -->
+    <section class="dashboard-col col-cpu-mem">
+
+      <!-- 1. CPU 카드 -->
+      <article class="card component-card card-glow-hover">
+        <div class="card-head">
+          <div class="hw-title-group">
+            <div class="hw-photo-frame" title="AMD Ryzen 7 9800X3D 실물">
+              <img src="assets/hardware/cpu.jpg" alt="AMD Ryzen 7 9800X3D" class="hw-thumb">
+              <span class="hw-photo-scan"></span>
+            </div>
+            <div class="hw-name-box">
+              <div class="hw-category">PROCESSOR</div>
+              <h2 class="component-name" id="cpuName">AMD Ryzen 7 9800X3D</h2>
+              <div class="hw-tags">
+                <span class="tag-pill tag-amd">AM5</span>
+                <span class="tag-pill">8C / 16T</span>
+                <span class="tag-pill tag-accent">96MB 3D V-Cache</span>
+              </div>
+            </div>
+          </div>
+          <div class="head-stat-box">
+            <span class="stat-caption">TDP DRAW</span>
+            <span class="component-power" id="cpuPower">--.- W</span>
+          </div>
+        </div>
+
+        <div class="component-middle">
+          <!-- 원형 도넛 게이지 -->
+          <div class="gauge-container">
+            <canvas id="cpuDonutCanvas" class="donut-canvas"></canvas>
+            <div class="gauge-text-overlay">
+              <span class="gauge-num" id="cpuTempText">--</span><span class="gauge-unit">°C</span>
+              <span class="gauge-sub-label">PACKAGE</span>
+            </div>
+          </div>
+
+          <!-- 메트릭스 2열 그리드 -->
+          <div class="metrics-grid cpu-grid">
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">Utilization</span>
+                <span class="m-val-bold" id="cpuLoadText">--%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-rainbow" id="cpuLoadBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">Core Voltage</span>
+                <span class="m-val" id="cpuVoltageText">-- V</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-pink-blue" id="cpuVoltageBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">Clock Speed</span>
+                <span class="m-val-bold" id="cpuSpeedText">-- GHz</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-gold-cyan" id="cpuSpeedBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">Cooler Fan</span>
+                <span class="m-val" id="cpuFanText">-- RPM</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-cyan-blue" id="cpuFanBar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8개 코어 실시간 로드 미니 바 -->
+        <div class="cpu-cores-panel">
+          <div class="section-micro-title-row">
+            <span class="section-micro-title">PER-CORE UTILIZATION (8C / 16T)</span>
+            <span class="micro-sub">Zen 5 Precision Boost 2</span>
+          </div>
+          <div class="core-bars-grid" id="cpuCoresGrid">
+            <div class="core-bar-item"><span class="core-num">C1</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core1Bar" style="width: 35%;"></div></div></div>
+            <div class="core-bar-item"><span class="core-num">C2</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core2Bar" style="width: 48%;"></div></div></div>
+            <div class="core-bar-item"><span class="core-num">C3</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core3Bar" style="width: 22%;"></div></div></div>
+            <div class="core-bar-item"><span class="core-num">C4</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core4Bar" style="width: 65%;"></div></div></div>
+            <div class="core-bar-item"><span class="core-num">C5</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core5Bar" style="width: 40%;"></div></div></div>
+            <div class="core-bar-item"><span class="core-num">C6</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core6Bar" style="width: 18%;"></div></div></div>
+            <div class="core-bar-item"><span class="core-num">C7</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core7Bar" style="width: 52%;"></div></div></div>
+            <div class="core-bar-item"><span class="core-num">C8</span><div class="bar-track core-track"><div class="bar-fill grad-rainbow" id="core8Bar" style="width: 30%;"></div></div></div>
+          </div>
+        </div>
+
+        <!-- 실시간 온도 스파크라인 그래프 -->
+        <div class="sparkline-wrapper">
+          <div class="sparkline-head">
+            <span class="sparkline-title">실시간 온도 추이 (°C)</span>
+            <div class="sparkline-legend">
+              <span>MIN: <b id="cpuGraphMin">--</b>°C</span>
+              <span>MAX: <b id="cpuGraphMax">--</b>°C</span>
+            </div>
+          </div>
+          <div class="sparkline-box">
+            <canvas id="cpuSparkCanvas" class="sparkline-draw"></canvas>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. Memory 카드 -->
+      <article class="card component-card card-glow-hover">
+        <div class="card-head">
+          <div class="hw-title-group">
+            <div class="hw-photo-frame" title="ADATA XPG Lancer DDR5 실물">
+              <img src="assets/hardware/ram.jpg" alt="ADATA XPG Lancer DDR5" class="hw-thumb">
+              <span class="hw-photo-scan"></span>
+            </div>
+            <div class="hw-name-box">
+              <div class="hw-category">SYSTEM MEMORY</div>
+              <h2 class="component-name" id="ramModel">ADATA XPG Lancer DDR5</h2>
+              <div class="hw-tags">
+                <span class="tag-pill tag-rgb">RGB Sync</span>
+                <span class="tag-pill">Dual-Channel</span>
+                <span class="tag-pill tag-accent">64GB (32GB×2)</span>
+              </div>
+            </div>
+          </div>
+          <div class="head-stat-box">
+            <span class="stat-caption">FREQUENCY</span>
+            <span class="component-power" id="ramSpeedText">DDR5-6000</span>
+          </div>
+        </div>
+
+        <div class="ram-details-grid">
+          <!-- DIMM 슬롯 상태 (Slot 1~4) -->
+          <div class="dimm-section">
+            <span class="section-micro-title">PHYSICAL DIMM SLOTS</span>
+            <div class="dimm-badges-container">
+              <div class="dimm-slot-card">
+                <span class="slot-idx">#1 (A1)</span>
+                <div class="dimm-circle"><span id="slot1">N/A</span></div>
+                <span class="slot-cap">Empty</span>
+              </div>
+              <div class="dimm-slot-card active">
+                <span class="slot-idx">#2 (A2)</span>
+                <div class="dimm-circle active"><span id="slot2">45</span></div>
+                <span class="slot-cap">32GB Active</span>
+              </div>
+              <div class="dimm-slot-card">
+                <span class="slot-idx">#3 (B1)</span>
+                <div class="dimm-circle"><span id="slot3">N/A</span></div>
+                <span class="slot-cap">Empty</span>
+              </div>
+              <div class="dimm-slot-card active">
+                <span class="slot-idx">#4 (B2)</span>
+                <div class="dimm-circle active"><span id="slot4">46</span></div>
+                <span class="slot-cap">32GB Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 메모리 상세 대역폭 & 스펙 미니 행 -->
+          <div class="ram-timing-row">
+            <div class="timing-pill"><span class="t-label">Timings:</span> <span class="t-val">CL30-36-36-76</span></div>
+            <div class="timing-pill"><span class="t-label">Voltage:</span> <span class="t-val">1.350 V (EXPO)</span></div>
+            <div class="timing-pill"><span class="t-label">Bandwidth:</span> <span class="t-val">~68.4 GB/s</span></div>
+          </div>
+
+          <!-- 메모리 사용량 바 & 정보 -->
+          <div class="memory-usage-section">
+            <div class="metric-row">
+              <span class="m-label-bold">Memory Capacity Usage</span>
+              <span class="m-val-highlight" id="ramPercentText">--%</span>
+            </div>
+            <div class="bar-track mem-track-large">
+              <div class="bar-fill grad-mem-long" id="ramProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="mem-bytes-row">
+              <div class="mem-byte-stat">
+                <span class="stat-sub">Allocated:</span>
+                <strong id="ramUsedText">-- GB</strong>
+              </div>
+              <div class="mem-byte-stat">
+                <span class="stat-sub">Available:</span>
+                <strong id="ramFreeText">-- GB</strong>
+              </div>
+              <div class="mem-byte-stat">
+                <span class="stat-sub">Installed:</span>
+                <strong id="ramTotalText">64.0 GB</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ==============================================
+         COLUMN 2: GPU & GAMING PERFORMANCE
+         ============================================== -->
+    <section class="dashboard-col col-gpu-gaming">
+
+      <!-- 3. GPU 카드 -->
+      <article class="card component-card card-glow-hover">
+        <div class="card-head">
+          <div class="hw-title-group">
+            <div class="hw-photo-frame" title="NVIDIA GeForce RTX 5070 Ti 실물">
+              <img src="assets/hardware/gpu.jpg" alt="NVIDIA GeForce RTX 5070 Ti" class="hw-thumb">
+              <span class="hw-photo-scan"></span>
+            </div>
+            <div class="hw-name-box">
+              <div class="hw-category">GRAPHICS CARD</div>
+              <h2 class="component-name" id="gpuName">nVIDIA GeForce RTX 5070 Ti</h2>
+              <div class="hw-tags">
+                <span class="tag-pill tag-nv">Blackwell</span>
+                <span class="tag-pill">16GB GDDR7</span>
+                <span class="tag-pill tag-accent">DLSS 4 / FG</span>
+              </div>
+            </div>
+          </div>
+          <div class="head-stat-box">
+            <span class="stat-caption">BOARD POWER</span>
+            <span class="component-power" id="gpuPower">--.- W</span>
+          </div>
+        </div>
+
+        <div class="component-middle">
+          <!-- 원형 도넛 게이지 -->
+          <div class="gauge-container">
+            <canvas id="gpuDonutCanvas" class="donut-canvas"></canvas>
+            <div class="gauge-text-overlay">
+              <span class="gauge-num" id="gpuTempText">--</span><span class="gauge-unit">°C</span>
+              <span class="gauge-sub-label">GPU CORE</span>
+            </div>
+          </div>
+
+          <!-- 메트릭스 2열 그리드 -->
+          <div class="metrics-grid gpu-grid">
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">GPU Load</span>
+                <span class="m-val-bold" id="gpuLoadText">--%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-rainbow" id="gpuLoadBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">GPU Clock</span>
+                <span class="m-val-bold" id="gpuClockText">-- MHz</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-gold-cyan" id="gpuClockBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">VRAM Usage</span>
+                <span class="m-val" id="gpuVramUsedText">-- GB</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-rainbow" id="gpuVramBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">VRAM Temp</span>
+                <span class="m-val" id="gpuVramTempText">--°C</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-pink-blue" id="gpuVramTempBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">Fan Speed</span>
+                <span class="m-val" id="gpuFanText">-- RPM</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-cyan-blue" id="gpuFanBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="metric-cell">
+              <div class="metric-row">
+                <span class="m-label">Core Voltage</span>
+                <span class="m-val" id="gpuVoltageText">-- V</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-pink-blue" id="gpuVoltageBar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GPU 추가 하이테크 스펙 바 -->
+        <div class="gpu-extra-specs-bar">
+          <span class="extra-stat-item">PCIe 4.0 x16 @ 64.0 GB/s</span>
+          <span class="extra-stat-sep">•</span>
+          <span class="extra-stat-item">NVDEC Decoder: 0%</span>
+          <span class="extra-stat-sep">•</span>
+          <span class="extra-stat-item">G-SYNC Compatible</span>
+        </div>
+
+        <!-- 실시간 GPU 온도 스파크라인 그래프 -->
+        <div class="sparkline-wrapper">
+          <div class="sparkline-head">
+            <span class="sparkline-title">GPU 온도 추이 (°C)</span>
+            <div class="sparkline-legend">
+              <span>MIN: <b id="gpuGraphMin">--</b>°C</span>
+              <span>MAX: <b id="gpuGraphMax">--</b>°C</span>
+            </div>
+          </div>
+          <div class="sparkline-box">
+            <canvas id="gpuSparkCanvas" class="sparkline-draw"></canvas>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4. 실시간 FPS & 게이밍 엔진 카드 -->
+      <article class="card component-card fps-card card-glow-hover">
+        <div class="card-head">
+          <div class="hw-title-group">
+            <div class="fps-engine-icon-wrap" id="fpsEngineIconWrap">
+              <span class="fps-main-icon" id="fpsMainIcon">🎮</span>
+              <span class="fps-radar-ring"></span>
+            </div>
+            <div class="hw-name-box">
+              <div class="hw-category">RENDERING ENGINE</div>
+              <h2 class="component-name">Real-Time FPS & Pacing</h2>
+              <div class="hw-tags">
+                <span class="tag-pill tag-rtss">RTSS Sync</span>
+                <span class="tag-pill" id="fpsActiveTarget">Active Engine</span>
+              </div>
+            </div>
+          </div>
+          <div class="head-stat-box">
+            <div class="fps-pill" id="fpsPill">
+              <span class="fps-pill-icon" id="fpsIcon">🎮</span>
+              <span class="fps-pill-val" id="fpsPillVal">--</span>
+              <span class="fps-pill-unit">FPS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fps-dashboard-row">
+          <!-- 거대한 FPS 카운터 -->
+          <div class="fps-big-display">
+            <div class="fps-counter-num-wrap">
+              <span class="fps-huge-num" id="fpsHugeNum">--</span>
+              <span class="fps-huge-label">FPS</span>
+            </div>
+            <div class="fps-active-status" id="fpsStatusDesc">RTSS 감지 대기 중...</div>
+          </div>
+
+          <!-- 프레임타임 및 지표들 -->
+          <div class="fps-substats-grid">
+            <div class="frametime-box">
+              <div class="stat-caption">FRAMETIME LATENCY</div>
+              <div class="frametime-val-row">
+                <span class="frametime-num" id="gpuFrametimeVal">--.-</span>
+                <span class="frametime-unit">ms</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-gold-cyan" id="gpuFrametimeBar" style="width: 25%;"></div>
+              </div>
+            </div>
+
+            <div class="frametime-box">
+              <div class="stat-caption">FPS GAUGE (MAX 240)</div>
+              <div class="frametime-val-row">
+                <span class="frametime-num" id="gpuFpsRowVal">-- FPS</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill grad-fps" id="gpuFpsBar" style="width: 40%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- eSports/게이밍 안정성 지표 패널 -->
+        <div class="fps-pacing-panel">
+          <div class="pacing-item">
+            <span class="pacing-label">1% Low FPS</span>
+            <span class="pacing-val" id="fpsOnePctLow">145 FPS</span>
+          </div>
+          <div class="pacing-item">
+            <span class="pacing-label">Frame Consistency</span>
+            <span class="pacing-val pacing-good">99.6% Smooth</span>
+          </div>
+          <div class="pacing-item">
+            <span class="pacing-label">Display Refresh</span>
+            <span class="pacing-val">100Hz VRR</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ==============================================
+         COLUMN 3: SSD STORAGE & NETWORK
+         ============================================== -->
+    <section class="dashboard-col col-ssd-net">
+
+      <!-- 5. SSD Storage 카드 -->
+      <article class="card component-card card-glow-hover">
+        <div class="card-head">
+          <div class="hw-title-group">
+            <div class="hw-photo-frame" title="Samsung SSD NVMe 실물">
+              <img src="assets/hardware/ssd.jpg" alt="Samsung NVMe SSD" class="hw-thumb">
+              <span class="hw-photo-scan"></span>
+            </div>
+            <div class="hw-name-box">
+              <div class="hw-category">HIGH-SPEED STORAGE</div>
+              <h2 class="component-name">Samsung NVMe M.2 SSDs</h2>
+              <div class="hw-tags">
+                <span class="tag-pill tag-nvme">PCIe Gen4/5 x4</span>
+                <span class="tag-pill">V-NAND TLC</span>
+                <span class="tag-pill tag-accent">Health: 100% Good</span>
+              </div>
+            </div>
+          </div>
+          <div class="head-stat-box">
+            <span class="stat-caption">TOTAL VOLUMES</span>
+            <span class="component-power" id="ssdDriveCount">2 Disks</span>
+          </div>
+        </div>
+
+        <!-- 스토리지 드라이브 목록 -->
+        <div class="drives-container-wide" id="drivesList">
+          <!-- JS에서 실제 드라이브 동적 렌더링 -->
+        </div>
+
+        <!-- 스토리지 버스 및 성능 상태 -->
+        <div class="storage-health-banner">
+          <span class="sh-item">⚡ Sequential Read: Up to 7,450 MB/s</span>
+          <span class="sh-sep">•</span>
+          <span class="sh-item">S.M.A.R.T Status: All Normal</span>
+        </div>
+      </article>
+
+      <!-- 6. Network 카드 -->
+      <article class="card component-card card-glow-hover">
+        <div class="card-head">
+          <div class="hw-title-group">
+            <div class="hw-photo-frame" title="Realtek WiFi 7 PCI-E NIC 실물">
+              <img src="assets/hardware/net.jpg" alt="Realtek WiFi 7 PCI-E NIC" class="hw-thumb">
+              <span class="hw-photo-scan"></span>
+            </div>
+            <div class="hw-name-box">
+              <div class="hw-category">NETWORK ADAPTER</div>
+              <h2 class="component-name" id="netAdapterName">Realtek WiFi 7 PCI-E NIC</h2>
+              <div class="hw-tags">
+                <span class="tag-pill tag-wifi">Wi-Fi 7 (802.11be)</span>
+                <span class="tag-pill">1201 Mbps</span>
+                <span class="tag-pill tag-accent" id="netPingVal">Ping: 8ms</span>
+              </div>
+            </div>
+          </div>
+          <div class="head-stat-box">
+            <span class="stat-caption">LINK STATUS</span>
+            <span class="component-power online-highlight" id="netStatusText">Connected</span>
+          </div>
+        </div>
+
+        <!-- 실시간 트래픽 속도 표시 -->
+        <div class="net-traffic-grid">
+          <div class="traffic-card traffic-download">
+            <div class="traffic-icon-group">
+              <span class="traffic-arrow arrow-down">↓</span>
+              <span class="traffic-type">DOWNLOAD SPEED</span>
+            </div>
+            <div class="traffic-speed" id="netRxSpeed">-- KB/s</div>
+          </div>
+
+          <div class="traffic-card traffic-upload">
+            <div class="traffic-icon-group">
+              <span class="traffic-arrow arrow-up">↑</span>
+              <span class="traffic-type">UPLOAD SPEED</span>
+            </div>
+            <div class="traffic-speed" id="netTxSpeed">-- KB/s</div>
+          </div>
+        </div>
+
+        <!-- 네트워크 부가 정보 배너 -->
+        <div class="net-extra-banner">
+          <div class="net-pill-item"><span class="np-label">Signal:</span> <span class="np-val">Excellent (-42 dBm)</span></div>
+          <div class="net-pill-item"><span class="np-label">Band:</span> <span class="np-val">6GHz Low Latency</span></div>
+        </div>
+
+        <!-- 네트워크 실시간 트래픽 스파크라인 그래프 -->
+        <div class="sparkline-wrapper">
+          <div class="sparkline-head">
+            <span class="sparkline-title">실시간 대역폭 트래픽 (Down / Up)</span>
+            <div class="sparkline-legend">
+              <span class="legend-down">● Down</span>
+              <span class="legend-up">● Up</span>
+            </div>
+          </div>
+          <div class="sparkline-box net-sparkline-box">
+            <canvas id="netSparkCanvas" class="sparkline-draw"></canvas>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- 하단 하이테크 시스템 풋터 바 -->
+  <footer class="app-footer-bar">
+    <div class="footer-left">
+      <span class="footer-dot-pulse"></span>
+      <span class="footer-stat">System Telemetry: Optimal</span>
+      <span class="footer-sep">•</span>
+      <span class="footer-stat">Sensor Polling: 1,000ms</span>
+      <span class="footer-sep">•</span>
+      <span class="footer-stat" id="footerDisplayInfo">Monitor 3 @ 2048×1152 Active</span>
+    </div>
+    <div class="footer-center">
+      <span class="edition-big-name" id="editionBigName">Ink Edition</span>
+    </div>
+    <div class="footer-right">
+      <span class="footer-brand">SYSDASH ULTRA PRO</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

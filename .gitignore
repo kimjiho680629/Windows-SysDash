@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build and Release distributions
+release/
+
+# Logs & temp
+*.log
+npm-debug.log*
+
+# OS temp files
+Thumbs.db
+.DS_Store
