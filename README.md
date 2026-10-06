@@ -28,7 +28,15 @@
 * **RTSS 게이밍 엔진 레이더 펄스**: 게임 실행 시 초록빛 레이더 펄스 및 초대형 FPS 카운터 발광.
 * **실시간 네트워크 웨이브**: 다운로드(Cyan) 및 업로드(Pink) 실시간 트래픽 듀얼 스파크라인 및 속도 플래시 화살표.
 
-### 4. 📊 3열 상세 하드웨어 텔레메트리 지표
+### 4. 🚀 윈도우 부팅 시 모니터 3 자동 실행 & 스마트 안착 가드
+* **Windows 시작 프로그램 이중 등록**:
+  * 레지스트리 (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\SysDash`) 및 시작프로그램 폴더(`%APPDATA%\...\Startup\SysDash.lnk`)에 동시 등록되어 PC를 켜자마자 자동으로 실행됩니다.
+* **부팅 시 디스플레이 지연 인식 안전 가드 (Safety Guard)**:
+  * 윈도우 부팅 직후 다중 모니터 드라이버가 순차적으로 로드되거나 모니터 3 인식이 1~3초 지연되더라도, 동적 이벤트(`screen.on('display-added')`, `screen.on('display-metrics-changed')`) 및 지연 보정 타이머가 작동하여 모니터 3(`X: 3425, Y: 1446, 2048×1152`)이 감지되는 즉시 자동으로 이동하여 전체화면으로 안착합니다.
+* **상단 헤더 원클릭 자동시작 토글**:
+  * 앱 상단 컨트롤 바의 **`[● 모니터3 자동시작: ON]`** 네온 버튼을 클릭하여 언제든지 자동 실행을 손쉽게 켜거나 끌 수 있습니다.
+
+### 5. 📊 3열 상세 하드웨어 텔레메트리 지표
 * **CPU (AMD Ryzen 7 9800X3D)**: 패키지 온도, TDP 전력(W), 부하율, 전압, 클럭(GHz), 팬 RPM, **8개 코어별(C1~C8) 실시간 부하 바**, 실시간 온도 추이 스파크라인.
 * **GPU (nVIDIA GeForce RTX 5070 Ti)**: 코어 온도, VRAM 온도, 소비 전력(W), 부하율, 클럭(MHz), 16GB GDDR7 VRAM 사용량, 0dB 팬 RPM, PCIe 4.0 x16 대역폭, 실시간 GPU 스파크라인.
 * **Gaming / FPS Engine (RTSS RivaTuner Sync)**: 게임 내 실시간 렌더링 FPS, 프레임타임(ms), 1% Low FPS, 99.6% 프레임 일관성(Smoothness), 디스플레이 100Hz VRR 연동.
@@ -38,6 +46,8 @@
 
 ---
 
-## 🚀 실행 방법
-* 프로젝트 폴더 내 **[SysDash.exe](file:///C:/Gemini_job/SysDash/SysDash.exe)**를 실행하면 모니터 3 전체화면으로 즉시 구동됩니다.
-* 또는 완전 독립 배포판인 **[release/SysDash/SysDash.exe](file:///C:/Gemini_job/SysDash/release/SysDash/SysDash.exe)**를 사용하여 실행할 수도 있습니다.
+## 🚀 실행 방법 및 환경 설정
+* **[SysDash.exe](file:///C:/Gemini_job/SysDash/SysDash.exe)**: 더블 클릭하여 실행하면 기본 타겟인 모니터 3 전체화면으로 즉시 구동됩니다.
+* **윈도우 자동 실행**: 이미 설정되어 있으므로 윈도우를 다시 시작하거나 부팅할 때 자동으로 모니터 3에 실행됩니다.
+* **독립 실행 배포본**: [release/SysDash/SysDash.exe](file:///C:/Gemini_job/SysDash/release/SysDash/SysDash.exe)를 사용하여 언제든 단독 실행할 수 있습니다.
+

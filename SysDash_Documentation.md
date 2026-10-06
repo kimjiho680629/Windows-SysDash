@@ -14,6 +14,7 @@
 * **실제 하드웨어 실물 사진 연동**: 실제 PC에 탑재된 부품(CPU, GPU, RAM, SSD, Network)의 고화질 실물 사진과 홀로그램 스캔 빔 애니메이션이 적용되었습니다.
 * **살아 숨쉬는 사이버 네온 애니메이션**: 배경 앰비언트 오로라 모션, 카드 3D 뎁스 및 네온 림라이트 호버, 원형 게이지 글로우 헤드 닷, RTSS 게이밍 레이더 펄스, 실시간 트래픽 웨이브.
 * **가독성 극대화 폰트 타이포그래피**: 모니터 3의 해상도에 맞추어 모든 주요 지표(온도 32px, FPS 58px, 전력 19px, 하드웨어 타이틀 18px 등)를 크고 선명하게 개편.
+* **윈도우 시작 시 자동 실행 & 스마트 안착 가드**: PC 부팅 시 자동으로 모니터 3에 보더리스 전체화면으로 실행되며, 다중 모니터 인식 지연 시에도 자동 보정 안착.
 * **듀얼 테마 지원**: **Ink Edition (딥 매트 다크 모드)**과 **Snow Edition (클린 화이트 모드)** 원클릭 실시간 전환.
 
 ---
@@ -49,7 +50,7 @@ C:\Gemini_job\SysDash\
 │   └── RtssReader.exe           # C# 컴파일된 초고속 RTSS FPS 수집 헬퍼
 │
 ├── src/
-│   ├── main.js                  # Electron 메인 프로세스 (모니터 3 자동 타겟, 다중 디스플레이 제어, IPC)
+│   ├── main.js                  # Electron 메인 프로세스 (모니터 3 타겟, 자동 시작 관리, 안전 가드, IPC)
 │   ├── preload.js               # 안전한 IPC 브릿지 (contextBridge)
 │   ├── collector.js             # 실시간 시스템 센서 수집 모듈 (CPU, GPU, RAM, Disk, FPS, Network)
 │   ├── native/
@@ -74,7 +75,27 @@ C:\Gemini_job\SysDash\
 
 ---
 
-## 4. 🚀 실행 방법
+## 4. 🚀 윈도우 시작 프로그램 & 모니터 3 자동 시작 설정
 
-* **[SysDash.exe](file:///C:/Gemini_job/SysDash/SysDash.exe)**를 실행하면 모니터 3 전체화면으로 즉시 실행됩니다.
-* 필요 시 상단 바에서 **`[🖥️ 모니터]`** 버튼을 통해 모니터 1, 2, 3으로 자유롭게 이동할 수 있으며, **`[⛶]`** 전체화면 토글 및 **`[📌]`** Always on Top 고정을 지원합니다.
+### (1) 자동 실행 등록 내역
+1. **Windows 레지스트리**:
+   * 키 경로: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
+   * 이름: `SysDash`
+   * 값: `"C:\Gemini_job\SysDash\SysDash.exe"`
+2. **시작프로그램 폴더 바로가기**:
+   * 위치: `C:\Users\kimjiho\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\SysDash.lnk`
+   * 대상: `C:\Gemini_job\SysDash\SysDash.exe`
+   * 작업 디렉터리: `C:\Gemini_job\SysDash`
+3. **설정 파일**:
+   * 위치: `C:\Users\kimjiho\AppData\Roaming\sysdash\sysdash_config.json`
+   * 값: `{"theme": "ink", "targetDisplayIndex": 2, "autoStart": true}`
+
+### (2) 스마트 안착 가드 (Safety Guard) 동작 원리
+* 윈도우 부팅 직후 다중 모니터 인식 순서나 드라이버 초기화 지연으로 인해 메인 모니터가 먼저 잡히더라도:
+  1. `screen.on('display-added')` 및 `screen.on('display-metrics-changed')` 이벤트 리스너가 대기
+  2. 앱 기동 1초, 3초, 7초 후 3회에 걸친 안전 보정 타이머 실행
+  3. 세 번째 모니터(`X: 3425, Y: 1446, 2048×1152`)가 확인되는 즉시 해당 좌표로 자동 이동 및 보더리스 전체화면 확장
+
+### (3) 상단 바 원클릭 제어
+* 앱 헤더 우측 상단에 **`[● 모니터3 자동시작: ON]`** 버튼이 상시 노출되어 등록 상태를 직관적으로 확인하고, 필요할 때 클릭하여 토글할 수 있습니다.
+
