@@ -66,6 +66,118 @@ function findMonitor3() {
   return displays[displays.length - 1] || screen.getPrimaryDisplay();
 }
 
+const { execSync } = require('child_process');
+
+function getSysDashExePath() {
+  const launcherPath = path.resolve(__dirname, '..', 'SysDash.exe');
+  if (fs.existsSync(launcherPath)) return launcherPath;
+  const standalonePath = path.resolve(__dirname, '..', 'release', 'SysDash', 'SysDash.exe');
+  if (fs.existsSync(standalonePath)) return standalonePath;
+  return process.execPath;
+}
+
+function isAutoStartEnabled() {
+  try {
+    const regCheck = execSync('reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v SysDash', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    if (regCheck && regCheck.includes('SysDash')) return true;
+  } catch (e) {}
+
+  try {
+    const startupDir = path.join(process.env.APPDATA, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup');
+    const shortcutPath = path.join(startupDir, 'SysDash.lnk');
+    if (fs.existsSync(shortcutPath)) return true;
+  } catch (e) {}
+
+  return false;
+}
+
+function enableAutoStart() {
+  const exePath = getSysDashExePath();
+  const workDir = path.dirname(exePath);
+
+  // 1. Windows 레지스트리 자동 실행 등록
+  try {
+    execSync(`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v SysDash /t REG_SZ /d "\\"${exePath}\\"" /f`, { stdio: 'ignore' });
+  } catch (e) {
+    console.error('Failed to register registry auto-start:', e);
+  }
+
+  // 2. 시작 프로그램 폴더 바로가기(.lnk) 생성 (작업 디렉토리 보장)
+  try {
+    const startupDir = path.join(process.env.APPDATA, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup');
+    const shortcutPath = path.join(startupDir, 'SysDash.lnk');
+    const psScript = `$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut('${shortcutPath.replace(/'/g, "''")}'); $s.TargetPath = '${exePath.replace(/'/g, "''")}'; $s.WorkingDirectory = '${workDir.replace(/'/g, "''")}'; $s.Save()`;
+    execSync(`powershell -NoProfile -Command "${psScript}"`, { stdio: 'ignore' });
+  } catch (e) {
+    console.error('Failed to create startup shortcut:', e);
+  }
+
+  // 3. Electron 내부 로그인 아이템 등록
+  try {
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      path: exePath
+    });
+  } catch (e) {}
+
+  const config = loadConfig();
+  config.autoStart = true;
+  saveConfig(config);
+  return true;
+}
+
+function disableAutoStart() {
+  // 1. 레지스트리 삭제
+  try {
+    execSync('reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v SysDash /f', { stdio: 'ignore' });
+  } catch (e) {}
+
+  // 2. 시작 프로그램 바로가기 삭제
+  try {
+    const startupDir = path.join(process.env.APPDATA, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup');
+    const shortcutPath = path.join(startupDir, 'SysDash.lnk');
+    if (fs.existsSync(shortcutPath)) {
+      fs.unlinkSync(shortcutPath);
+    }
+  } catch (e) {}
+
+  // 3. Electron 내부 로그인 아이템 해제
+  try {
+    app.setLoginItemSettings({
+      openAtLogin: false
+    });
+  } catch (e) {}
+
+  const config = loadConfig();
+  config.autoStart = false;
+  saveConfig(config);
+  return false;
+}
+
+function relocateToMonitor3() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+
+  const targetDisplay = findMonitor3();
+  const currentBounds = mainWindow.getBounds();
+
+  // 이미 모니터 3 위치에 적합하게 배치되어 있는지 확인
+  const matchesTarget = 
+    Math.abs(currentBounds.x - targetDisplay.bounds.x) < 30 &&
+    Math.abs(currentBounds.y - targetDisplay.bounds.y) < 30 &&
+    Math.abs(currentBounds.width - targetDisplay.bounds.width) < 30 &&
+    Math.abs(currentBounds.height - targetDisplay.bounds.height) < 30;
+
+  if (!matchesTarget) {
+    console.log(`[SysDash] Relocating to Monitor 3: ${targetDisplay.bounds.x}, ${targetDisplay.bounds.y} (${targetDisplay.bounds.width}x${targetDisplay.bounds.height})`);
+    mainWindow.setBounds({
+      x: targetDisplay.bounds.x,
+      y: targetDisplay.bounds.y,
+      width: targetDisplay.bounds.width,
+      height: targetDisplay.bounds.height
+    });
+  }
+}
+
 function createWindow() {
   const config = loadConfig();
   const targetDisplay = findMonitor3();
@@ -94,35 +206,16 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, 'renderer/index.html'));
 
+  // 윈도우 부팅 시 다중 모니터 지연 인식에 대비한 안전 재배치 가드
+  setTimeout(relocateToMonitor3, 1000);
+  setTimeout(relocateToMonitor3, 3000);
+  setTimeout(relocateToMonitor3, 7000);
+
   collector = new SystemCollector();
   collector.init().then(() => {
     collector.getMetrics().then(data => {
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('metrics-update', data);
-
-        // 캡처 생성 (화면 검증용)
-        setTimeout(async () => {
-          if (mainWindow && !mainWindow.isDestroyed()) {
-            await mainWindow.webContents.executeJavaScript("setTheme('ink');");
-            setTimeout(async () => {
-              if (mainWindow && !mainWindow.isDestroyed()) {
-                const imgInk = await mainWindow.webContents.capturePage();
-                fs.writeFileSync(path.join(__dirname, '../preview_wide_ink.png'), imgInk.toPNG());
-
-                await mainWindow.webContents.executeJavaScript("setTheme('snow');");
-                setTimeout(async () => {
-                  if (mainWindow && !mainWindow.isDestroyed()) {
-                    const imgSnow = await mainWindow.webContents.capturePage();
-                    fs.writeFileSync(path.join(__dirname, '../preview_wide_snow.png'), imgSnow.toPNG());
-
-                    const cfg = loadConfig();
-                    await mainWindow.webContents.executeJavaScript(`setTheme('${cfg.theme || 'ink'}');`);
-                  }
-                }, 700);
-              }
-            }, 700);
-          }
-        }, 1500);
       }
     });
 
@@ -218,7 +311,36 @@ ipcMain.handle('get-initial-theme', () => {
   return config.theme || 'ink';
 });
 
-app.whenReady().then(createWindow);
+ipcMain.handle('get-autostart-status', () => {
+  return isAutoStartEnabled();
+});
+
+ipcMain.handle('toggle-autostart', () => {
+  const currentlyEnabled = isAutoStartEnabled();
+  if (currentlyEnabled) {
+    return disableAutoStart();
+  } else {
+    return enableAutoStart();
+  }
+});
+
+app.whenReady().then(() => {
+  createWindow();
+
+  // 모니터 동적 감지 이벤트 (부팅 중 모니터가 늦게 인식되거나 해상도 변경 시 모니터 3으로 자동 안착)
+  screen.on('display-added', () => {
+    setTimeout(relocateToMonitor3, 500);
+  });
+  screen.on('display-metrics-changed', () => {
+    setTimeout(relocateToMonitor3, 500);
+  });
+
+  // 초기 자동 시작 설정 동기화
+  const config = loadConfig();
+  if (config.autoStart === undefined || config.autoStart === true) {
+    enableAutoStart();
+  }
+});
 
 app.on('window-all-closed', () => {
   if (metricsInterval) clearInterval(metricsInterval);
@@ -232,3 +354,4 @@ app.on('activate', () => {
     createWindow();
   }
 });
+

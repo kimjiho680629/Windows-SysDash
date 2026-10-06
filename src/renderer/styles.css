@@ -349,6 +349,45 @@ body {
   color: #00d2ff;
 }
 
+.autostart-btn {
+  width: auto;
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 6px;
+  border-radius: 6px;
+  background: rgba(128, 128, 128, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-sub);
+  transition: all 0.2s ease;
+}
+
+.autostart-btn:hover {
+  background: rgba(0, 230, 118, 0.15);
+  border-color: rgba(0, 230, 118, 0.4);
+  color: var(--text-main);
+}
+
+.autostart-btn.active {
+  background: rgba(0, 230, 118, 0.15);
+  border: 1px solid rgba(0, 230, 118, 0.5);
+  color: #00e676;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.25);
+}
+
+.autostart-dot {
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  background: #757575;
+  transition: all 0.2s ease;
+}
+
+.autostart-btn.active .autostart-dot {
+  background: #00e676;
+  box-shadow: 0 0 6px #00e676;
+}
+
 .display-selector-wrap {
   position: relative;
 }

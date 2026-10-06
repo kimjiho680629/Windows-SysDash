@@ -132,6 +132,36 @@ function setTheme(theme) {
 btnInk.addEventListener('click', () => setTheme('ink'));
 btnSnow.addEventListener('click', () => setTheme('snow'));
 
+const autostartBtn = document.getElementById('autostartBtn');
+
+async function updateAutoStartUI() {
+  if (!window.api || !window.api.getAutoStartStatus || !autostartBtn) return;
+  try {
+    const isEnabled = await window.api.getAutoStartStatus();
+    const label = autostartBtn.querySelector('.autostart-label');
+    if (isEnabled) {
+      autostartBtn.classList.add('active');
+      if (label) label.textContent = '모니터3 자동시작: ON';
+      autostartBtn.setAttribute('title', '윈도우 부팅 시 모니터 3에 자동 실행됩니다 (클릭하여 끄기)');
+    } else {
+      autostartBtn.classList.remove('active');
+      if (label) label.textContent = '모니터3 자동시작: OFF';
+      autostartBtn.setAttribute('title', '현재 자동 시작이 꺼져 있습니다 (클릭하여 켜기)');
+    }
+  } catch (err) {
+    console.error('Failed to get autostart status:', err);
+  }
+}
+
+if (autostartBtn) {
+  autostartBtn.addEventListener('click', async () => {
+    if (window.api && window.api.toggleAutoStart) {
+      await window.api.toggleAutoStart();
+      await updateAutoStartUI();
+    }
+  });
+}
+
 // ====================================================
 // 윈도우 조작 이벤트
 // ====================================================
@@ -702,6 +732,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   await loadDisplays();
+  await updateAutoStartUI();
 
   if (window.api && window.api.onMetricsUpdate) {
     window.api.onMetricsUpdate(updateUI);

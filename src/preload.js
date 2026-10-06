@@ -12,5 +12,7 @@ contextBridge.exposeInMainWorld('api', {
   getDisplays: () => ipcRenderer.invoke('get-displays'),
   setTargetDisplay: (displayIndex) => ipcRenderer.invoke('set-target-display', displayIndex),
   saveTheme: (theme) => ipcRenderer.send('save-theme', theme),
-  getInitialTheme: () => ipcRenderer.invoke('get-initial-theme')
+  getInitialTheme: () => ipcRenderer.invoke('get-initial-theme'),
+  getAutoStartStatus: () => ipcRenderer.invoke('get-autostart-status'),
+  toggleAutoStart: () => ipcRenderer.invoke('toggle-autostart')
 });
