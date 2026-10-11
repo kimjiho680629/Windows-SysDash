@@ -11,3 +11,7 @@ npm-debug.log*
 # OS temp files
 Thumbs.db
 .DS_Store
+
+# Backups & local scratch images
+FontBackups/
+scratch/*.png

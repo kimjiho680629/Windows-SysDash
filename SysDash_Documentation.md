@@ -99,3 +99,39 @@ C:\Gemini_job\SysDash\
 ### (3) 상단 바 원클릭 제어
 * 앱 헤더 우측 상단에 **`[● 모니터3 자동시작: ON]`** 버튼이 상시 노출되어 등록 상태를 직관적으로 확인하고, 필요할 때 클릭하여 토글할 수 있습니다.
 
+---
+
+## 5. 🔄 윈도우 재설치(Clean Install) 시 원클릭 복원 절차
+
+1. **사전 준비**: Node.js (v18+ LTS), Git for Windows, NVIDIA 최신 드라이버.
+2. **저장소 클론 및 패키지 설치**:
+   ```powershell
+   git clone https://github.com/kimjiho680629/Sys_Dash.git C:\Gemini_job\SysDash
+   cd C:\Gemini_job\SysDash
+   npm install
+   ```
+3. **독립 배포본 빌드**:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File scratch/build_standalone.ps1
+   ```
+4. **실행 및 자동 시작 활성화**:
+   * [SysDash.exe](SysDash.exe) 실행 후 상단 `[● 모니터3 자동시작]` 버튼 활성화 확인.
+
+---
+
+## 6. 🧩 새로운 시스템에 적용하기 (New Hardware Customization Guide)
+
+1. **원클릭 하드웨어 사양 감지**:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File scratch/detect_system_specs.ps1
+   ```
+   * 터미널에 표시된 모니터 번호/해상도/좌표, CPU/GPU/RAM/Disk 스펙을 확인합니다.
+2. **대상 모니터 설정 ([src/main.js](src/main.js))**:
+   * `findMonitor3()` 함수의 `bounds.x`, `width`, `height` 또는 디스플레이 인덱스를 새 환경에 맞게 수정.
+3. **하드웨어 센서 기본값 ([src/collector.js](src/collector.js))**:
+   * `this.cpuStatic`, `this.ramSpeed`, GPU 이름 및 VRAM 용량을 새 부품 사양으로 업데이트.
+4. **UI 표시 텍스트 ([src/renderer/index.html](src/renderer/index.html))**:
+   * `cpuName`, `gpuName`, `ramSpec`, 스토리지 드라이브 명칭 수정.
+5. **실물 부품 사진 교체 ([src/renderer/assets/hardware/](src/renderer/assets/hardware/))**:
+   * `cpu.jpg`, `gpu.jpg`, `ram.jpg`, `ssd.jpg`, `net.jpg`를 새 부품 사진으로 교체 (정사각 권장).
+
