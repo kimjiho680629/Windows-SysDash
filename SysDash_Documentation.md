@@ -68,6 +68,21 @@ C:\Gemini_job\SysDash\
 │               ├── ssd.jpg      # Samsung NVMe M.2 SSD 실물
 │               └── net.jpg      # Realtek WiFi 7 PCI-E NIC 실물
 │
+├── SystemFont/                  # [시스템 글꼴 변경 유틸리티]
+│   ├── README.md                # 시스템 폰트 변경기 전용 사용 설명서
+│   ├── SysFontChanger.exe       # C# WPF GUI 글꼴 변경 실행 파일
+│   ├── SysFontChanger.cs        # C# WPF 전체 소스 코드
+│   ├── SysFontChanger.manifest  # 관리자 권한 UAC 매니페스트
+│   ├── sys_font_changer.py      # Python 글꼴 변경 스크립트
+│   └── FontBackups/             # 원본 레지스트리 자동 백업 폴더
+│
+├── scratch/
+│   ├── detect_system_specs.ps1  # 새 시스템 사양 및 모니터 자동 진단 스크립트
+│   ├── build_standalone.ps1     # 무설치 독립형 패키지 빌드 스크립트
+│   └── check_rtss.ps1           # RTSS 연동 진단 스크립트
+│
+├── push_to_github.bat           # 원클릭 GitHub 푸시 스크립트
+│
 └── release/                     # 독립형 Electron 배포본 (패키지 완료)
     └── SysDash/
         └── SysDash.exe          # 배포 패키지 실행 파일

@@ -13,5 +13,6 @@ Thumbs.db
 .DS_Store
 
 # Backups & local scratch images
+**/FontBackups/
 FontBackups/
 scratch/*.png

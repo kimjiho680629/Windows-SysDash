@@ -239,8 +239,15 @@ SysDash/
 │   ├── build_standalone.ps1     # 무설치 독립형 패키지 빌드 스크립트
 │   └── check_rtss.ps1           # RTSS 연동 진단 스크립트
 │
-├── SysFontChanger.cs            # Windows 시스템 폰트 커스텀 도구 소스
-└── SysFontChanger.exe           # Windows 시스템 폰트 커스텀 도구 실행 파일
+├── SystemFont/                  # [시스템 폰트 도구 모음]
+│   ├── README.md                # 폰트 변경기 전용 사용 설명서
+│   ├── SysFontChanger.exe       # C# WPF GUI 글꼴 변경 실행 파일
+│   ├── SysFontChanger.cs        # C# WPF 전체 소스 코드
+│   ├── SysFontChanger.manifest  # 관리자 권한 UAC 매니페스트
+│   ├── sys_font_changer.py      # Python 글꼴 변경 스크립트
+│   └── FontBackups/             # 원본 레지스트리 자동 백업 폴더
+│
+└── push_to_github.bat           # 원클릭 GitHub 푸시 스크립트
 ```
 
 ---
