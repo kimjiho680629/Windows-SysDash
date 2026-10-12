@@ -106,7 +106,7 @@ C:\Gemini_job\SysDash\
 1. **사전 준비**: Node.js (v18+ LTS), Git for Windows, NVIDIA 최신 드라이버.
 2. **저장소 클론 및 패키지 설치**:
    ```powershell
-   git clone https://github.com/kimjiho680629/Sys_Dash.git C:\Gemini_job\SysDash
+   git clone https://github.com/kimjiho680629/Windows-SysDash.git C:\Gemini_job\SysDash
    cd C:\Gemini_job\SysDash
    npm install
    ```

@@ -1,9 +1,9 @@
 # 🖥️ SysDash WinVer (Windows Dedicated Hardware Dashboard)
 
-[![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%2010-0078D4?logo=windows&logoColor=white)](https://github.com/kimjiho680629/Sys_Dash)
-[![Framework](https://img.shields.io/badge/Electron-44.x-47848F?logo=electron&logoColor=white)](https://github.com/kimjiho680629/Sys_Dash)
-[![RTSS Integration](https://img.shields.io/badge/RTSS-RivaTuner%20Sync-brightgreen)](https://github.com/kimjiho680629/Sys_Dash)
-[![Theme](https://img.shields.io/badge/Theme-Ink%20%26%20Snow-blueviolet)](https://github.com/kimjiho680629/Sys_Dash)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%2010-0078D4?logo=windows&logoColor=white)](https://github.com/kimjiho680629/Windows-SysDash)
+[![Framework](https://img.shields.io/badge/Electron-44.x-47848F?logo=electron&logoColor=white)](https://github.com/kimjiho680629/Windows-SysDash)
+[![RTSS Integration](https://img.shields.io/badge/RTSS-RivaTuner%20Sync-brightgreen)](https://github.com/kimjiho680629/Windows-SysDash)
+[![Theme](https://img.shields.io/badge/Theme-Ink%20%26%20Snow-blueviolet)](https://github.com/kimjiho680629/Windows-SysDash)
 
 > **SysDash WinVer**는 Windows 전용으로 제작된 고성능 실시간 하드웨어 텔레메트리 대시보드입니다.  
 > 서브 모니터(기본값: 모니터 3, 2048 × 1152 초광폭 해상도)에 완벽하게 최적화된 **3열 하이테크 사이버네틱 레이아웃**, **실물 부품 사진 홀로그램 스캔 연동**, **RTSS 게이밍 프레임/FPS 레이더**, **Windows 부팅 시 자동 시작 및 다중 디스플레이 스마트 안착 가드**를 제공합니다.
@@ -69,7 +69,7 @@
 터미널(PowerShell 또는 CMD)을 열고 실행합니다:
 ```powershell
 # 1. 저장소 클론
-git clone https://github.com/kimjiho680629/Sys_Dash.git C:\Gemini_job\SysDash
+git clone https://github.com/kimjiho680629/Windows-SysDash.git C:\Gemini_job\SysDash
 cd C:\Gemini_job\SysDash
 
 # 2. 의존성 패키지 설치
